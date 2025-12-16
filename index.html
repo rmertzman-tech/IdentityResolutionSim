@@ -1,41 +1,875 @@
 <!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | {{{ PRODUCT_NAME }}}</title>
-  </head>
-  <body style="text-align: center">
-    <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}} style="width: {{{ WIDTH }}}px; height: {{{ HEIGHT }}}px; background: {{{ BACKGROUND_FILENAME ? 'url(\'Build/' + BACKGROUND_FILENAME.replace(/'/g, '%27') + '\') center / cover' : BACKGROUND_COLOR }}}"></canvas>
-    <script src="Build/{{{ LOADER_FILENAME }}}"></script>
-    <script>
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-      }
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Resolution Simulator | Ethics Beyond Boundaries</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      createUnityInstance(document.querySelector("#unity-canvas"), {
-        dataUrl: "Build/{{{ DATA_FILENAME }}}",
-        frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
-#if USE_WASM
-        codeUrl: "Build/{{{ CODE_FILENAME }}}",
-#endif
-#if MEMORY_FILENAME
-        memoryUrl: "Build/{{{ MEMORY_FILENAME }}}",
-#endif
-#if SYMBOLS_FILENAME
-        symbolsUrl: "Build/{{{ SYMBOLS_FILENAME }}}",
-#endif
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
-        productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
-        productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
-        // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
-        // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
-      });
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .intro-text {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .intro-text p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .intro-text strong {
+            color: #667eea;
+        }
+
+        /* Stress Control Section */
+        .control-section {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .control-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .stress-level-display {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 20px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-track {
+            height: 20px;
+            background: linear-gradient(to right, 
+                #4ade80 0%, 
+                #fbbf24 35%, 
+                #fb923c 60%, 
+                #ef4444 85%, 
+                #991b1b 100%);
+            border-radius: 10px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 4px solid #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        input[type="range"]::-moz-range-track {
+            height: 20px;
+            background: linear-gradient(to right, 
+                #4ade80 0%, 
+                #fbbf24 35%, 
+                #fb923c 60%, 
+                #ef4444 85%, 
+                #991b1b 100%);
+            border-radius: 10px;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 4px solid #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Visual Display Section */
+        .visual-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 768px) {
+            .visual-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .identity-display {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .identity-display h3 {
+            margin-bottom: 20px;
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+
+        .pixel-grid {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            aspect-ratio: 1;
+            display: grid;
+            gap: 2px;
+            background: #ddd;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.5s ease;
+        }
+
+        .pixel {
+            background: #667eea;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .resolution-label {
+            margin-top: 15px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        /* Capabilities Section */
+        .capabilities-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .capabilities-section h3 {
+            margin-bottom: 20px;
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+
+        .capability-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .capability-item.active {
+            border-left: 4px solid #4ade80;
+            background: #f0fdf4;
+        }
+
+        .capability-item.degraded {
+            border-left: 4px solid #fbbf24;
+            background: #fffbeb;
+            opacity: 0.7;
+        }
+
+        .capability-item.offline {
+            border-left: 4px solid #ef4444;
+            background: #fef2f2;
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        .capability-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            min-width: 30px;
+        }
+
+        .capability-text {
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .capability-status {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin-left: 10px;
+        }
+
+        .capability-status.online {
+            background: #4ade80;
+            color: white;
+        }
+
+        .capability-status.reduced {
+            background: #fbbf24;
+            color: #78350f;
+        }
+
+        .capability-status.down {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Explanation Section */
+        .explanation-section {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .explanation-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .explanation-text {
+            line-height: 1.8;
+            color: #555;
+            font-size: 1.05rem;
+        }
+
+        .explanation-text strong {
+            color: #667eea;
+        }
+
+        /* Personal Assessment Section */
+        .assessment-section {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .assessment-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .question-group {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .question-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .checkbox-group {
+            margin: 10px 0;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .your-result {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 3px solid #667eea;
+            display: none;
+        }
+
+        .your-result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .your-result h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .result-score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .result-explanation {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .recommendations {
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #4ade80;
+        }
+
+        .recommendations h5 {
+            color: #166534;
+            margin-bottom: 10px;
+        }
+
+        .recommendations ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Identity Resolution Simulator</h1>
+            <p>See How Stress Changes Who You Are</p>
+        </div>
+
+        <div class="main-content">
+            <div class="intro-text">
+                <p><strong>Your identity is like a photograph:</strong> When you're calm and safe, it's high-resolution—detailed, nuanced, complex. When you're stressed, it's low-resolution—pixelated, simplified, generic.</p>
+                <p>This simulator lets you <strong>see this process happen</strong>. Move the stress slider and watch your identity change in real-time.</p>
+            </div>
+
+            <!-- Stress Control -->
+            <div class="control-section">
+                <h2>Adjust Your Stress Level</h2>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>😌 Calm & Safe</span>
+                        <span>🔥 Crisis Mode</span>
+                    </div>
+                    <input type="range" id="stressSlider" min="0" max="100" value="25" step="1">
+                </div>
+                <div id="stressDisplay" class="stress-level-display">
+                    Current Stress Level: <span id="stressValue">25</span>%
+                    <div id="stressEmoji" style="font-size: 3rem; margin-top: 10px;">😌</div>
+                </div>
+            </div>
+
+            <!-- Visual Display -->
+            <div class="visual-section">
+                <div class="identity-display">
+                    <h3>Your Identity's Resolution</h3>
+                    <div id="pixelGrid" class="pixel-grid"></div>
+                    <div id="resolutionLabel" class="resolution-label">HIGH RESOLUTION</div>
+                    <p style="margin-top: 15px; color: #666; font-size: 0.95rem;">
+                        <span id="pixelCount">400</span> details defining who you are
+                    </p>
+                </div>
+
+                <div class="capabilities-section">
+                    <h3>Available Capabilities</h3>
+                    <div id="capabilitiesList">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Explanation -->
+            <div class="explanation-section">
+                <h3>What's Happening?</h3>
+                <div id="explanationText" class="explanation-text">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Personal Assessment -->
+            <div class="assessment-section">
+                <h3>Calculate Your Current Resolution</h3>
+                <p style="margin-bottom: 20px; color: #666;">Answer these questions honestly to estimate your current stress level and available resolution:</p>
+
+                <div class="question-group">
+                    <label>Physical State (check all that apply):</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" class="stress-factor" data-stress="15"> Getting less than 6 hours of sleep regularly</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Chronic pain or illness</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Skipping meals due to time/money</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="5"> Not exercising at all</label>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label>Financial Situation (check all that apply):</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" class="stress-factor" data-stress="20"> Behind on rent/mortgage or worried about eviction</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="15"> Can't afford unexpected $500 expense</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Working multiple jobs to make ends meet</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="5"> Worried about money daily</label>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label>Relationships & Support (check all that apply):</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" class="stress-factor" data-stress="15"> Major relationship conflict (partner, family)</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Feel isolated, no one to talk to</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Caregiving responsibilities (kids, elderly parents, etc.)</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="5"> No time for social connection</label>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label>Work/School (check all that apply):</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" class="stress-factor" data-stress="15"> Hostile or toxic work/school environment</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Working/studying 60+ hours per week</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Job insecurity or failing grades</label>
+                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Values conflict (forced to do things against your ethics)</label>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculatePersonalStress()">Calculate My Current Resolution</button>
+
+                <div id="yourResult" class="your-result">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Remember:</strong> Low resolution doesn't mean you're weak or broken. It means you're operating in conditions that make high-resolution identity unsustainable.</p>
+            <p>The goal isn't to never lose resolution—that's impossible. The goal is to recognize when you're truncated, be compassionate with yourself, and work to restore resolution when possible.</p>
+            <p style="margin-top: 20px; font-size: 0.9rem; color: #999;">
+                Based on research in computational physics, neuroscience, and information theory.<br>
+                Ethics Beyond Boundaries Project | Saint Petersburg College
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Capabilities data structure
+        const capabilities = [
+            { id: 1, text: "Complex moral reasoning", icon: "🧩", thresholds: [0, 40, 70] },
+            { id: 2, text: "See multiple perspectives", icon: "👁️", thresholds: [0, 45, 75] },
+            { id: 3, text: "Emotional regulation", icon: "🎭", thresholds: [0, 35, 65] },
+            { id: 4, text: "Long-term planning (months ahead)", icon: "📅", thresholds: [0, 50, 80] },
+            { id: 5, text: "Empathy and compassion", icon: "❤️", thresholds: [0, 40, 70] },
+            { id: 6, text: "Creative problem-solving", icon: "💡", thresholds: [0, 45, 75] },
+            { id: 7, text: "Self-control and impulse management", icon: "🛡️", thresholds: [0, 35, 65] },
+            { id: 8, text: "Nuanced judgment", icon: "⚖️", thresholds: [0, 50, 80] },
+            { id: 9, text: "Sense of humor", icon: "😄", thresholds: [0, 40, 70] },
+            { id: 10, text: "Patience with others", icon: "🕊️", thresholds: [0, 35, 65] }
+        ];
+
+        // Initialize
+        let currentStress = 25;
+
+        function initializePixelGrid(gridSize) {
+            const grid = document.getElementById('pixelGrid');
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            
+            const totalPixels = gridSize * gridSize;
+            for (let i = 0; i < totalPixels; i++) {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                grid.appendChild(pixel);
+            }
+        }
+
+        function updateVisualization(stress) {
+            currentStress = stress;
+            
+            // Update display
+            document.getElementById('stressValue').textContent = stress;
+            
+            // Update emoji
+            const emojiSpan = document.getElementById('stressEmoji');
+            if (stress < 30) {
+                emojiSpan.textContent = '😌';
+            } else if (stress < 50) {
+                emojiSpan.textContent = '😐';
+            } else if (stress < 70) {
+                emojiSpan.textContent = '😰';
+            } else if (stress < 85) {
+                emojiSpan.textContent = '😱';
+            } else {
+                emojiSpan.textContent = '🔥';
+            }
+            
+            // Update stress display color
+            const stressDisplay = document.getElementById('stressDisplay');
+            if (stress < 30) {
+                stressDisplay.style.background = '#d1fae5';
+                stressDisplay.style.color = '#065f46';
+            } else if (stress < 50) {
+                stressDisplay.style.background = '#fef3c7';
+                stressDisplay.style.color = '#78350f';
+            } else if (stress < 70) {
+                stressDisplay.style.background = '#fed7aa';
+                stressDisplay.style.color = '#7c2d12';
+            } else if (stress < 85) {
+                stressDisplay.style.background = '#fecaca';
+                stressDisplay.style.color = '#991b1b';
+            } else {
+                stressDisplay.style.background = '#991b1b';
+                stressDisplay.style.color = 'white';
+            }
+            
+            // Update pixel grid resolution
+            let gridSize;
+            if (stress < 30) {
+                gridSize = 20; // 400 pixels
+            } else if (stress < 50) {
+                gridSize = 15; // 225 pixels
+            } else if (stress < 70) {
+                gridSize = 10; // 100 pixels
+            } else if (stress < 85) {
+                gridSize = 6; // 36 pixels
+            } else {
+                gridSize = 4; // 16 pixels
+            }
+            
+            initializePixelGrid(gridSize);
+            document.getElementById('pixelCount').textContent = gridSize * gridSize;
+            
+            // Update resolution label
+            const resLabel = document.getElementById('resolutionLabel');
+            if (stress < 30) {
+                resLabel.textContent = 'HIGH RESOLUTION';
+                resLabel.style.color = '#065f46';
+            } else if (stress < 50) {
+                resLabel.textContent = 'GOOD RESOLUTION';
+                resLabel.style.color = '#78350f';
+            } else if (stress < 70) {
+                resLabel.textContent = 'REDUCED RESOLUTION';
+                resLabel.style.color = '#c2410c';
+            } else if (stress < 85) {
+                resLabel.textContent = 'LOW RESOLUTION';
+                resLabel.style.color = '#991b1b';
+            } else {
+                resLabel.textContent = 'SURVIVAL MODE ONLY';
+                resLabel.style.color = '#7f1d1d';
+            }
+            
+            // Update capabilities
+            updateCapabilities(stress);
+            
+            // Update explanation
+            updateExplanation(stress);
+        }
+
+        function updateCapabilities(stress) {
+            const list = document.getElementById('capabilitiesList');
+            list.innerHTML = '';
+            
+            capabilities.forEach(cap => {
+                const item = document.createElement('div');
+                item.className = 'capability-item';
+                
+                let status, statusClass, statusText;
+                if (stress < cap.thresholds[1]) {
+                    status = 'active';
+                    statusClass = 'online';
+                    statusText = 'ONLINE';
+                } else if (stress < cap.thresholds[2]) {
+                    status = 'degraded';
+                    statusClass = 'reduced';
+                    statusText = 'REDUCED';
+                } else {
+                    status = 'offline';
+                    statusClass = 'down';
+                    statusText = 'OFFLINE';
+                }
+                
+                item.classList.add(status);
+                item.innerHTML = `
+                    <span class="capability-icon">${cap.icon}</span>
+                    <span class="capability-text">${cap.text}</span>
+                    <span class="capability-status ${statusClass}">${statusText}</span>
+                `;
+                
+                list.appendChild(item);
+            });
+        }
+
+        function updateExplanation(stress) {
+            const explanations = [
+                {
+                    range: [0, 30],
+                    text: `<strong>You're operating at high resolution.</strong> Your full identity is available. You can handle complex moral dilemmas, see situations from multiple perspectives, and regulate your emotions effectively. This is "Manual Mode" - the sophisticated, nuanced version of you. Your brain has the energy budget to maintain all the details that make you <em>you</em>.`
+                },
+                {
+                    range: [30, 50],
+                    text: `<strong>You're starting to lose some resolution.</strong> Most capabilities are still online, but they require more conscious effort. Complex thinking is harder. Emotional regulation takes more energy. You can still be your full self, but it's getting more expensive. Think of this as your phone at 50% battery - everything works, but you're watching the power drain.`
+                },
+                {
+                    range: [50, 70],
+                    text: `<strong>Your identity is simplifying.</strong> You're losing access to nuanced judgment and long-term planning. Empathy becomes difficult. You start seeing things in black-and-white rather than shades of gray. This is the transition from "Manual Mode" to "Automatic Mode" - your brain is shedding complexity to conserve energy. You're still you, but a compressed version.`
+                },
+                {
+                    range: [70, 85],
+                    text: `<strong>You're in survival mode.</strong> Most sophisticated capabilities are offline. Complex moral reasoning is impossible - you can only handle simple, binary choices. Emotional regulation has failed. Future planning has collapsed to "get through today." Your identity has truncated to basic survival patterns. This isn't weakness - your brain literally cannot maintain complexity at this temperature.`
+                },
+                {
+                    range: [85, 100],
+                    text: `<strong>Complete truncation - crisis mode.</strong> Only the most primitive responses remain. Fight, flight, freeze. No empathy, no planning, no self-control, no nuance. You've been reduced to pure reflex. The complex, nuanced person you are has been temporarily compressed to save power. This is what burnout, severe PTSD, or extreme crisis looks like. You haven't lost yourself forever - but you've lost access to almost all of yourself right now.`
+                }
+            ];
+            
+            const explanation = explanations.find(e => stress >= e.range[0] && stress < e.range[1]);
+            document.getElementById('explanationText').innerHTML = explanation.text;
+        }
+
+        function calculatePersonalStress() {
+            const checkboxes = document.querySelectorAll('.stress-factor:checked');
+            let totalStress = 0;
+            
+            checkboxes.forEach(checkbox => {
+                totalStress += parseInt(checkbox.dataset.stress);
+            });
+            
+            // Cap at 100
+            totalStress = Math.min(totalStress, 100);
+            
+            // Update the slider
+            document.getElementById('stressSlider').value = totalStress;
+            updateVisualization(totalStress);
+            
+            // Show result
+            const resultDiv = document.getElementById('yourResult');
+            let resultText = '';
+            let resolutionPercent = Math.max(0, 100 - totalStress);
+            
+            if (totalStress < 30) {
+                resultText = `
+                    <h4>Your Estimated Current State:</h4>
+                    <div class="result-score" style="color: #065f46;">
+                        ${resolutionPercent}% Resolution Available
+                    </div>
+                    <div class="result-explanation">
+                        <p><strong>Status: High Resolution - Functioning Well</strong></p>
+                        <p>You're operating with most of your cognitive and emotional capabilities intact. While you have some stress factors, they're manageable and not significantly compromising your ability to be your full self.</p>
+                    </div>
+                    <div class="recommendations">
+                        <h5>To Maintain High Resolution:</h5>
+                        <ul>
+                            <li>Protect your sleep schedule</li>
+                            <li>Maintain social connections</li>
+                            <li>Keep up with self-care practices</li>
+                            <li>Watch for early signs of stress accumulation</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (totalStress < 50) {
+                resultText = `
+                    <h4>Your Estimated Current State:</h4>
+                    <div class="result-score" style="color: #78350f;">
+                        ${resolutionPercent}% Resolution Available
+                    </div>
+                    <div class="result-explanation">
+                        <p><strong>Status: Good Resolution - Some Compression</strong></p>
+                        <p>You're experiencing moderate stress that's starting to affect your capacity. You can still function well, but it takes more effort. Some capabilities are beginning to degrade.</p>
+                    </div>
+                    <div class="recommendations">
+                        <h5>To Prevent Further Degradation:</h5>
+                        <ul>
+                            <li>Prioritize addressing 1-2 major stressors</li>
+                            <li>Build in recovery time between demands</li>
+                            <li>Seek support for areas where you're struggling</li>
+                            <li>Practice stress management techniques</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (totalStress < 70) {
+                resultText = `
+                    <h4>Your Estimated Current State:</h4>
+                    <div class="result-score" style="color: #c2410c;">
+                        ${resolutionPercent}% Resolution Available
+                    </div>
+                    <div class="result-explanation">
+                        <p><strong>Status: Reduced Resolution - Significant Impact</strong></p>
+                        <p>You're under substantial stress that's meaningfully compromising your capabilities. Complex thinking, emotional regulation, and long-term planning are all degraded. This is the range where burnout begins.</p>
+                    </div>
+                    <div class="recommendations">
+                        <h5>⚠️ Restoration Needed:</h5>
+                        <ul>
+                            <li><strong>Priority: Reduce major stressors ASAP</strong></li>
+                            <li>Consider professional support (therapy, counseling)</li>
+                            <li>Communicate your limits to others</li>
+                            <li>Focus on basic self-care (sleep, food, safety)</li>
+                            <li>This is not sustainable - changes needed</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                resultText = `
+                    <h4>Your Estimated Current State:</h4>
+                    <div class="result-score" style="color: #991b1b;">
+                        ${resolutionPercent}% Resolution Available
+                    </div>
+                    <div class="result-explanation">
+                        <p><strong>Status: Low Resolution - Crisis Level</strong></p>
+                        <p>You're in a severe stress state that has substantially truncated your identity and capabilities. Most sophisticated functions are offline. This is survival mode - and it's not sustainable.</p>
+                    </div>
+                    <div class="recommendations">
+                        <h5>🚨 Immediate Intervention Needed:</h5>
+                        <ul>
+                            <li><strong>Seek professional help immediately</strong></li>
+                            <li>Crisis hotline if in acute distress: 988</li>
+                            <li>Reduce obligations wherever possible</li>
+                            <li>Ask for help from support system</li>
+                            <li>Focus only on basic survival needs</li>
+                            <li>This level of stress causes physical harm over time</li>
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            resultDiv.innerHTML = resultText;
+            resultDiv.classList.add('show');
+            
+            // Scroll to result
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Event listeners
+        document.getElementById('stressSlider').addEventListener('input', (e) => {
+            updateVisualization(parseInt(e.target.value));
+        });
+
+        // Initialize on load
+        updateVisualization(25);
     </script>
-  </body>
+</body>
 </html>
