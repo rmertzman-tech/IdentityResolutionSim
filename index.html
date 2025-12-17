@@ -3,12 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Identity Resolution Simulator | Ethics Beyond Boundaries</title>
+    <title>Identity Resolution Learning System | Ethics Beyond Boundaries</title>
+    <meta name="description" content="Interactive learning system for understanding how stress affects cognitive capacity and identity resolution">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #000;
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .skip-link:focus {
+            top: 0;
         }
 
         body {
@@ -17,6 +33,7 @@
             min-height: 100vh;
             padding: 20px;
             color: #333;
+            line-height: 1.6;
         }
 
         .container {
@@ -41,44 +58,172 @@
             font-weight: 700;
         }
 
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.95;
+        .mode-selection {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .mode-selection h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .mode-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .mode-btn {
+            background: white;
+            border: 3px solid #667eea;
+            padding: 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover,
+        .mode-btn:focus {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        .mode-btn h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .mode-btn p {
+            color: #666;
+            font-size: 0.95rem;
         }
 
         .main-content {
             padding: 40px;
+            display: none;
         }
 
-        .intro-text {
-            background: #f8f9fa;
-            padding: 20px;
+        .main-content.active {
+            display: block;
+        }
+
+        .progress-container {
+            background: #f0f0f0;
             border-radius: 10px;
+            padding: 20px;
             margin-bottom: 30px;
-            border-left: 5px solid #667eea;
         }
 
-        .intro-text p {
-            line-height: 1.6;
-            margin-bottom: 10px;
+        .progress-bar {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
         }
 
-        .intro-text strong {
-            color: #667eea;
+        .progress-fill {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
         }
 
-        /* Stress Control Section */
-        .control-section {
+        .progress-text {
+            margin-top: 10px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .activity {
             background: white;
             border: 2px solid #e0e0e0;
             border-radius: 15px;
             padding: 30px;
-            margin-bottom: 30px;
+            margin: 20px 0;
+            display: none;
         }
 
-        .control-section h2 {
-            font-size: 1.8rem;
+        .activity.active {
+            display: block;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .activity-title {
+            color: #667eea;
+            font-size: 1.8rem;
+        }
+
+        .activity-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-tutorial {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-check {
+            background: #fef3c7;
+            color: #78350f;
+        }
+
+        .badge-explore {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-journal {
+            background: #fce7f3;
+            color: #9f1239;
+        }
+
+        .instructions {
+            background: #e0f2fe;
+            border-left: 4px solid #0284c7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .instructions strong {
+            color: #0c4a6e;
+        }
+
+        .simulator-embed {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .stress-control {
+            margin: 20px 0;
+        }
+
+        .stress-control h3 {
+            margin-bottom: 15px;
             color: #667eea;
         }
 
@@ -91,17 +236,7 @@
             justify-content: space-between;
             margin-bottom: 10px;
             font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .stress-level-display {
-            font-size: 2rem;
-            font-weight: bold;
-            text-align: center;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            transition: all 0.3s ease;
+            font-size: 0.95rem;
         }
 
         input[type="range"] {
@@ -111,6 +246,11 @@
             appearance: none;
             background: transparent;
             cursor: pointer;
+        }
+
+        input[type="range"]:focus {
+            outline: 3px solid #667eea;
+            outline-offset: 3px;
         }
 
         input[type="range"]::-webkit-slider-track {
@@ -137,7 +277,8 @@
             transition: all 0.2s ease;
         }
 
-        input[type="range"]::-webkit-slider-thumb:hover {
+        input[type="range"]::-webkit-slider-thumb:hover,
+        input[type="range"]::-webkit-slider-thumb:focus {
             transform: scale(1.1);
             box-shadow: 0 6px 16px rgba(0,0,0,0.4);
         }
@@ -163,44 +304,25 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        /* Visual Display Section */
-        .visual-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin: 30px 0;
-        }
-
-        @media (max-width: 768px) {
-            .visual-section {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .identity-display {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 30px;
+        .stress-display {
             text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
         }
 
-        .identity-display h3 {
-            margin-bottom: 20px;
-            color: #667eea;
-            font-size: 1.5rem;
-        }
-
-        .pixel-grid {
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-            aspect-ratio: 1;
+        .resolution-visual {
             display: grid;
             gap: 2px;
             background: #ddd;
             padding: 10px;
             border-radius: 10px;
-            transition: all 0.5s ease;
+            margin: 20px auto;
+            max-width: 350px;
+            aspect-ratio: 1;
         }
 
         .pixel {
@@ -209,24 +331,8 @@
             transition: all 0.3s ease;
         }
 
-        .resolution-label {
-            margin-top: 15px;
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: #333;
-        }
-
-        /* Capabilities Section */
-        .capabilities-section {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 30px;
-        }
-
-        .capabilities-section h3 {
-            margin-bottom: 20px;
-            color: #667eea;
-            font-size: 1.5rem;
+        .capabilities-list {
+            margin: 20px 0;
         }
 
         .capability-item {
@@ -237,22 +343,26 @@
             border-radius: 8px;
             transition: all 0.3s ease;
             background: white;
+            border: 2px solid #e0e0e0;
         }
 
         .capability-item.active {
             border-left: 4px solid #4ade80;
             background: #f0fdf4;
+            border-color: #4ade80;
         }
 
         .capability-item.degraded {
             border-left: 4px solid #fbbf24;
             background: #fffbeb;
+            border-color: #fbbf24;
             opacity: 0.7;
         }
 
         .capability-item.offline {
             border-left: 4px solid #ef4444;
             background: #fef2f2;
+            border-color: #ef4444;
             opacity: 0.5;
             text-decoration: line-through;
         }
@@ -291,311 +401,1189 @@
             color: white;
         }
 
-        /* Explanation Section */
-        .explanation-section {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 15px;
-            padding: 30px;
-            margin: 30px 0;
-        }
-
-        .explanation-section h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-        }
-
-        .explanation-text {
-            line-height: 1.8;
-            color: #555;
-            font-size: 1.05rem;
-        }
-
-        .explanation-text strong {
-            color: #667eea;
-        }
-
-        /* Personal Assessment Section */
-        .assessment-section {
-            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-            border-radius: 15px;
-            padding: 30px;
-            margin: 30px 0;
-        }
-
-        .assessment-section h3 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-        }
-
-        .question-group {
-            background: white;
+        .quiz-question {
+            background: #f8f9fa;
             padding: 20px;
             border-radius: 10px;
             margin: 15px 0;
         }
 
-        .question-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
+        .quiz-question h4 {
+            margin-bottom: 15px;
             color: #333;
         }
 
-        .checkbox-group {
-            margin: 10px 0;
+        .quiz-options {
+            margin: 15px 0;
         }
 
-        .checkbox-group label {
-            display: flex;
-            align-items: center;
+        .quiz-option {
+            display: block;
+            padding: 12px;
             margin: 8px 0;
-            cursor: pointer;
-            font-weight: normal;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            margin-right: 10px;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-
-        .calculate-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .calculate-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .your-result {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            border: 3px solid #667eea;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-option:hover,
+        .quiz-option:focus {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .quiz-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .quiz-feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
             display: none;
         }
 
-        .your-result.show {
+        .quiz-feedback.correct {
+            background: #d1fae5;
+            border-left: 4px solid #059669;
             display: block;
-            animation: slideIn 0.5s ease;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .quiz-feedback.incorrect {
+            background: #fee2e2;
+            border-left: 4px solid #dc2626;
+            display: block;
         }
 
-        .your-result h4 {
+        .checklist {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .checklist-item label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .stress-score {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .journal-area {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+        }
+
+        .journal-area:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .word-count {
+            text-align: right;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .char-limit-warning {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover,
+        button:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button.secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        button.secondary:hover {
+            background: #f0f4ff;
+        }
+
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .tutorial-overlay.active {
+            display: flex;
+        }
+
+        .tutorial-box {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .tutorial-box h3 {
             color: #667eea;
             margin-bottom: 15px;
-            font-size: 1.3rem;
         }
 
-        .result-score {
-            font-size: 2.5rem;
-            font-weight: bold;
+        .tutorial-step-indicator {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .completion-badge {
+            background: #d1fae5;
+            border: 3px solid #059669;
+            border-radius: 15px;
+            padding: 30px;
             text-align: center;
             margin: 20px 0;
         }
 
-        .result-explanation {
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .recommendations {
-            background: #f0fdf4;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 4px solid #4ade80;
-        }
-
-        .recommendations h5 {
-            color: #166534;
+        .completion-badge h3 {
+            color: #059669;
+            font-size: 2rem;
             margin-bottom: 10px;
         }
 
-        .recommendations ul {
-            margin-left: 20px;
-            line-height: 1.8;
+        .completion-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
         }
 
-        .footer {
+        .export-section {
             background: #f8f9fa;
+            border-radius: 15px;
             padding: 30px;
-            text-align: center;
-            color: #666;
-            border-top: 1px solid #e0e0e0;
+            margin: 30px 0;
         }
 
-        .footer p {
-            margin: 10px 0;
-            line-height: 1.6;
+        .export-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .export-preview {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            margin: 20px 0;
+        }
+
+        .status-complete {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .status-incomplete {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .sr-only {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-contrast: high) {
+            .container {
+                border: 3px solid #000;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
         }
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <div class="container">
-        <div class="header">
-            <h1>🧠 Identity Resolution Simulator</h1>
-            <p>See How Stress Changes Who You Are</p>
+        <header class="header" role="banner">
+            <h1>🧠 Identity Resolution Learning System</h1>
+            <p>Understanding How Stress Reduces Your Cognitive Capacity</p>
+        </header>
+
+        <!-- Mode Selection -->
+        <div id="modeSelection" class="mode-selection">
+            <h2>Choose Your Path</h2>
+            <p style="color: #666; margin-bottom: 20px;">Estimated time: ~1 hour for complete workbook</p>
+            
+            <div class="mode-buttons">
+                <button class="mode-btn" onclick="startMode('tutorial')" aria-label="Start with guided tutorial">
+                    <h3>📚 Guided Tutorial</h3>
+                    <p>New to this concept? Start here for step-by-step introduction (~10 min)</p>
+                </button>
+
+                <button class="mode-btn" onclick="startMode('workbook')" aria-label="Go directly to workbook activities">
+                    <h3>📝 Workbook Activities</h3>
+                    <p>Already familiar? Jump straight to the activities (~50 min)</p>
+                </button>
+
+                <button class="mode-btn" onclick="continueProgress()" aria-label="Continue where you left off">
+                    <h3>🔄 Continue</h3>
+                    <p>Resume from where you left off</p>
+                    <p id="progressIndicator" style="margin-top: 10px; color: #667eea; font-weight: 600;"></p>
+                </button>
+            </div>
         </div>
 
-        <div class="main-content">
-            <div class="intro-text">
-                <p><strong>Your identity is like a photograph:</strong> When you're calm and safe, it's high-resolution—detailed, nuanced, complex. When you're stressed, it's low-resolution—pixelated, simplified, generic.</p>
-                <p>This simulator lets you <strong>see this process happen</strong>. Move the stress slider and watch your identity change in real-time.</p>
+        <!-- Main Content -->
+        <main id="main-content" class="main-content" role="main">
+            <!-- Progress Bar -->
+            <div class="progress-container" role="region" aria-label="Progress indicator">
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+                <div class="progress-text" id="progressText">Not started</div>
             </div>
 
-            <!-- Stress Control -->
-            <div class="control-section">
-                <h2>Adjust Your Stress Level</h2>
-                <div class="slider-container">
-                    <div class="slider-label">
-                        <span>😌 Calm & Safe</span>
-                        <span>🔥 Crisis Mode</span>
-                    </div>
-                    <input type="range" id="stressSlider" min="0" max="100" value="25" step="1">
+            <!-- Activities Container -->
+            <div id="activitiesContainer"></div>
+
+            <!-- Export Section -->
+            <div id="exportSection" class="export-section" style="display: none;">
+                <h3>📄 Export Your Work</h3>
+                <p>Your responses are ready to submit. Download as text file or copy to clipboard.</p>
+                
+                <div class="button-group">
+                    <button onclick="exportToFile()" aria-label="Download responses as text file">
+                        💾 Download Text File
+                    </button>
+                    <button onclick="copyToClipboard()" class="secondary" aria-label="Copy responses to clipboard">
+                        📋 Copy to Clipboard
+                    </button>
+                    <button onclick="previewExport()" class="secondary" aria-label="Preview export format">
+                        👁️ Preview
+                    </button>
                 </div>
-                <div id="stressDisplay" class="stress-level-display">
-                    Current Stress Level: <span id="stressValue">25</span>%
-                    <div id="stressEmoji" style="font-size: 3rem; margin-top: 10px;">😌</div>
-                </div>
+
+                <div id="exportPreview" class="export-preview" style="display: none;" role="region" aria-label="Export preview"></div>
+
+                <div id="exportStatus" role="status" aria-live="polite" style="margin-top: 15px; font-weight: 600;"></div>
             </div>
+        </main>
 
-            <!-- Visual Display -->
-            <div class="visual-section">
-                <div class="identity-display">
-                    <h3>Your Identity's Resolution</h3>
-                    <div id="pixelGrid" class="pixel-grid"></div>
-                    <div id="resolutionLabel" class="resolution-label">HIGH RESOLUTION</div>
-                    <p style="margin-top: 15px; color: #666; font-size: 0.95rem;">
-                        <span id="pixelCount">400</span> details defining who you are
-                    </p>
-                </div>
-
-                <div class="capabilities-section">
-                    <h3>Available Capabilities</h3>
-                    <div id="capabilitiesList">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Explanation -->
-            <div class="explanation-section">
-                <h3>What's Happening?</h3>
-                <div id="explanationText" class="explanation-text">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Personal Assessment -->
-            <div class="assessment-section">
-                <h3>Calculate Your Current Resolution</h3>
-                <p style="margin-bottom: 20px; color: #666;">Answer these questions honestly to estimate your current stress level and available resolution:</p>
-
-                <div class="question-group">
-                    <label>Physical State (check all that apply):</label>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" class="stress-factor" data-stress="15"> Getting less than 6 hours of sleep regularly</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Chronic pain or illness</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Skipping meals due to time/money</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="5"> Not exercising at all</label>
-                    </div>
-                </div>
-
-                <div class="question-group">
-                    <label>Financial Situation (check all that apply):</label>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" class="stress-factor" data-stress="20"> Behind on rent/mortgage or worried about eviction</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="15"> Can't afford unexpected $500 expense</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Working multiple jobs to make ends meet</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="5"> Worried about money daily</label>
-                    </div>
-                </div>
-
-                <div class="question-group">
-                    <label>Relationships & Support (check all that apply):</label>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" class="stress-factor" data-stress="15"> Major relationship conflict (partner, family)</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Feel isolated, no one to talk to</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Caregiving responsibilities (kids, elderly parents, etc.)</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="5"> No time for social connection</label>
-                    </div>
-                </div>
-
-                <div class="question-group">
-                    <label>Work/School (check all that apply):</label>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" class="stress-factor" data-stress="15"> Hostile or toxic work/school environment</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Working/studying 60+ hours per week</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Job insecurity or failing grades</label>
-                        <label><input type="checkbox" class="stress-factor" data-stress="10"> Values conflict (forced to do things against your ethics)</label>
-                    </div>
-                </div>
-
-                <button class="calculate-btn" onclick="calculatePersonalStress()">Calculate My Current Resolution</button>
-
-                <div id="yourResult" class="your-result">
-                    <!-- Will be populated by JavaScript -->
+        <!-- Tutorial Overlay -->
+        <div id="tutorialOverlay" class="tutorial-overlay" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
+            <div class="tutorial-box">
+                <div class="tutorial-step-indicator" id="tutorialStep" aria-live="polite"></div>
+                <h3 id="tutorialTitle"></h3>
+                <div id="tutorialContent"></div>
+                <div class="button-group">
+                    <button id="tutorialPrev" onclick="tutorialPrevious()" class="secondary">⬅️ Previous</button>
+                    <button id="tutorialNext" onclick="tutorialNext()">Next ➡️</button>
+                    <button onclick="skipTutorial()" class="secondary">Skip Tutorial</button>
                 </div>
             </div>
         </div>
 
-        <div class="footer">
-            <p><strong>Remember:</strong> Low resolution doesn't mean you're weak or broken. It means you're operating in conditions that make high-resolution identity unsustainable.</p>
-            <p>The goal isn't to never lose resolution—that's impossible. The goal is to recognize when you're truncated, be compassionate with yourself, and work to restore resolution when possible.</p>
-            <p style="margin-top: 20px; font-size: 0.9rem; color: #999;">
-                Based on research in computational physics, neuroscience, and information theory.<br>
-                Ethics Beyond Boundaries Project | Saint Petersburg College
-            </p>
-        </div>
+        <!-- Screen reader announcements -->
+        <div role="status" aria-live="assertive" aria-atomic="true" class="sr-only" id="srAnnouncements"></div>
     </div>
 
     <script>
-        // Capabilities data structure
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        
+        let state = {
+            currentActivity: 0,
+            completedActivities: new Set(),
+            tutorialStep: 0,
+            tutorialCompleted: false,
+            responses: {},
+            stressLevel: 25,
+            stressFactors: {},
+            studentName: '',
+            startTime: null
+        };
+
         const capabilities = [
             { id: 1, text: "Complex moral reasoning", icon: "🧩", thresholds: [0, 40, 70] },
             { id: 2, text: "See multiple perspectives", icon: "👁️", thresholds: [0, 45, 75] },
             { id: 3, text: "Emotional regulation", icon: "🎭", thresholds: [0, 35, 65] },
-            { id: 4, text: "Long-term planning (months ahead)", icon: "📅", thresholds: [0, 50, 80] },
+            { id: 4, text: "Long-term planning", icon: "📅", thresholds: [0, 50, 80] },
             { id: 5, text: "Empathy and compassion", icon: "❤️", thresholds: [0, 40, 70] },
             { id: 6, text: "Creative problem-solving", icon: "💡", thresholds: [0, 45, 75] },
-            { id: 7, text: "Self-control and impulse management", icon: "🛡️", thresholds: [0, 35, 65] },
+            { id: 7, text: "Self-control", icon: "🛡️", thresholds: [0, 35, 65] },
             { id: 8, text: "Nuanced judgment", icon: "⚖️", thresholds: [0, 50, 80] },
             { id: 9, text: "Sense of humor", icon: "😄", thresholds: [0, 40, 70] },
             { id: 10, text: "Patience with others", icon: "🕊️", thresholds: [0, 35, 65] }
         ];
 
-        // Initialize
-        let currentStress = 25;
+        function loadState() {
+            const saved = localStorage.getItem('identityResolutionState');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state = {
+                    ...state,
+                    ...parsed,
+                    completedActivities: new Set(parsed.completedActivities || [])
+                };
+            }
+            updateProgressIndicator();
+        }
 
-        function initializePixelGrid(gridSize) {
-            const grid = document.getElementById('pixelGrid');
+        function saveState() {
+            const toSave = {
+                ...state,
+                completedActivities: Array.from(state.completedActivities)
+            };
+            localStorage.setItem('identityResolutionState', JSON.stringify(toSave));
+        }
+
+        // ============================================
+        // ACTIVITY DEFINITIONS
+        // ============================================
+        
+        const activities = [
+            {
+                id: 'intro',
+                type: 'intro',
+                title: 'Welcome: Why Stress Makes You "Dumber"',
+                badge: 'Start Here',
+                badgeClass: 'badge-tutorial',
+                time: '2 min',
+                content: `
+                    <p style="font-size: 1.1rem; margin-bottom: 20px;">Welcome! In this workbook, you'll learn why stress doesn't just make you feel bad—it actually <strong>reduces your cognitive capacity</strong> in measurable, predictable ways.</p>
+                    
+                    <div class="instructions">
+                        <strong>Key Concept: "Resolution"</strong><br>
+                        Your identity is like a photograph. When you're calm, it's <strong>high-resolution</strong>—detailed, nuanced, complex. When you're stressed, it's <strong>low-resolution</strong>—simplified, pixelated, basic.
+                    </div>
+
+                    <p style="margin: 20px 0;">This isn't metaphor—it's <strong>physics and neuroscience</strong>. Your brain is a computer with a fixed energy budget. Complex thinking costs energy. Under stress, your body redirects energy to survival, forcing you into "low resolution mode."</p>
+
+                    <p style="margin: 20px 0;"><strong>What you'll do:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Explore how stress affects your capabilities</li>
+                        <li>Calculate your own current stress level</li>
+                        <li>Learn why this matters for ethics</li>
+                        <li>Reflect on your own experience</li>
+                    </ul>
+
+                    <p style="margin: 20px 0;"><strong>Estimated time:</strong> ~1 hour total</p>
+
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                        <label for="studentName" style="display: block; font-weight: 600; margin-bottom: 10px;">
+                            Enter your name for the export file:
+                        </label>
+                        <input type="text" 
+                               id="studentName" 
+                               placeholder="Your name"
+                               style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;"
+                               value="${state.studentName || ''}"
+                               onchange="state.studentName = this.value; saveState();"
+                               aria-label="Enter your name">
+                    </div>
+                `
+            },
+            {
+                id: 'baseline',
+                type: 'completion',
+                title: 'Activity 1: Your Current Resolution',
+                badge: 'Hands-On',
+                badgeClass: 'badge-explore',
+                time: '5 min',
+                content: `
+                    <div class="instructions">
+                        <strong>Instructions:</strong> Adjust the stress slider to match how you're feeling RIGHT NOW. Watch what happens to your identity resolution and available capabilities.
+                    </div>
+
+                    <div class="simulator-embed">
+                        <div class="stress-control">
+                            <h3>Your Current Stress Level</h3>
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>😌 Calm & Rested</span>
+                                    <span>🔥 Exhausted & Overwhelmed</span>
+                                </div>
+                                <input type="range" 
+                                       id="baselineStress" 
+                                       min="0" 
+                                       max="100" 
+                                       value="25"
+                                       oninput="updateBaselineDisplay()"
+                                       aria-label="Your current stress level from 0 to 100"
+                                       aria-valuemin="0"
+                                       aria-valuemax="100"
+                                       aria-valuenow="25">
+                            </div>
+                            <div class="stress-display" id="baselineStressDisplay">
+                                Current Stress: <span id="baselineStressValue">25</span>%
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                            <div>
+                                <h4 style="text-align: center; margin-bottom: 15px;">Your Identity Resolution</h4>
+                                <div id="baselinePixelGrid" class="resolution-visual"></div>
+                                <p style="text-align: center; color: #666; margin-top: 10px;">
+                                    <strong id="baselinePixelCount">400</strong> details defining who you are
+                                </p>
+                            </div>
+
+                            <div>
+                                <h4 style="margin-bottom: 15px;">Available Capabilities</h4>
+                                <div id="baselineCapabilities" class="capabilities-list"></div>
+                            </div>
+                        </div>
+
+                        <div id="baselineExplanation" style="background: white; padding: 20px; border-radius: 10px; margin-top: 20px; line-height: 1.8;"></div>
+                    </div>
+
+                    <p style="margin-top: 20px; color: #666;">Move the slider and observe. When ready, click "Complete & Continue."</p>
+                `
+            },
+            {
+                id: 'quiz1',
+                type: 'quiz',
+                title: 'Concept Check 1: Understanding Resolution',
+                badge: 'Self-Graded',
+                badgeClass: 'badge-check',
+                time: '5 min',
+                questions: [
+                    {
+                        question: 'What does "resolution" mean in this model?',
+                        options: [
+                            'Your determination to solve problems',
+                            'The level of detail and complexity available in your identity and thinking',
+                            'Your ability to see clearly',
+                            'The strength of your willpower'
+                        ],
+                        correct: 1,
+                        explanation: 'Resolution refers to the level of detail, nuance, and complexity you can maintain in your identity and cognitive processes—like pixel resolution in an image.'
+                    },
+                    {
+                        question: 'Why does stress reduce resolution?',
+                        options: [
+                            'Because you\'re not trying hard enough',
+                            'Because stress is a sign of weak character',
+                            'Because your brain redirects energy from complex processes to survival functions',
+                            'Because stress makes you lazy'
+                        ],
+                        correct: 2,
+                        explanation: 'Your brain has a fixed energy budget. Under stress, your body treats this as an emergency and redirects energy from "expensive" complex thinking to "cheap" survival responses. This is thermodynamics, not weakness.'
+                    },
+                    {
+                        question: 'Which statement is TRUE about low resolution?',
+                        options: [
+                            'Low resolution is permanent damage',
+                            'Low resolution is a temporary state that can be reversed',
+                            'Low resolution only affects unintelligent people',
+                            'Low resolution has no effect on moral behavior'
+                        ],
+                        correct: 1,
+                        explanation: 'Resolution loss is temporary, like a battery draining. When stress decreases and energy is restored, resolution returns. You haven\'t lost yourself—just temporary access to yourself.'
+                    }
+                ]
+            },
+            {
+                id: 'assessment',
+                type: 'completion',
+                title: 'Activity 2: Calculate Your Stress Sources',
+                badge: 'Self-Assessment',
+                badgeClass: 'badge-explore',
+                time: '10 min',
+                content: `
+                    <div class="instructions">
+                        <strong>Instructions:</strong> Check all factors that apply to YOUR life right now. Be honest—this helps you understand your current operating conditions.
+                    </div>
+
+                    <div class="simulator-embed">
+                        <div class="checklist">
+                            <h4 style="margin-bottom: 15px;">Physical State</h4>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-sleep" data-stress="15" onchange="updateStressCalculation()">
+                                <label for="factor-sleep">Getting less than 6 hours of sleep regularly</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-pain" data-stress="10" onchange="updateStressCalculation()">
+                                <label for="factor-pain">Chronic pain or illness</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-meals" data-stress="10" onchange="updateStressCalculation()">
+                                <label for="factor-meals">Skipping meals due to time/money constraints</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-exercise" data-stress="5" onchange="updateStressCalculation()">
+                                <label for="factor-exercise">No physical activity/exercise</label>
+                            </div>
+                        </div>
+
+                        <div class="checklist">
+                            <h4 style="margin-bottom: 15px;">Financial Situation</h4>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-housing" data-stress="20" onchange="updateStressCalculation()">
+                                <label for="factor-housing">Behind on rent/mortgage or worried about housing</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-emergency" data-stress="15" onchange="updateStressCalculation()">
+                                <label for="factor-emergency">Can't afford unexpected $500 expense</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-jobs" data-stress="10" onchange="updateStressCalculation()">
+                                <label for="factor-jobs">Working multiple jobs to make ends meet</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-money-worry" data-stress="5" onchange="updateStressCalculation()">
+                                <label for="factor-money-worry">Daily worry about money</label>
+                            </div>
+                        </div>
+
+                        <div class="checklist">
+                            <h4 style="margin-bottom: 15px;">Relationships & Support</h4>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-conflict" data-stress="15" onchange="updateStressCalculation()">
+                                <label for="factor-conflict">Major relationship conflict (partner, family)</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-isolation" data-stress="10" onchange="updateStressCalculation()">
+                                <label for="factor-isolation">Feel isolated, no one to talk to</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-caregiving" data-stress="10" onchange="updateStressCalculation()">
+                                <label for="factor-caregiving">Heavy caregiving responsibilities</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-social" data-stress="5" onchange="updateStressCalculation()">
+                                <label for="factor-social">No time for social connection</label>
+                            </div>
+                        </div>
+
+                        <div class="checklist">
+                            <h4 style="margin-bottom: 15px;">Work/School</h4>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-toxic" data-stress="15" onchange="updateStressCalculation()">
+                                <label for="factor-toxic">Hostile or toxic work/school environment</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-hours" data-stress="10" onchange="updateStressCalculation()">
+                                <label for="factor-hours">Working/studying 60+ hours per week</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-insecurity" data-stress="10" onchange="updateStressCalculation()">
+                                <label for="factor-insecurity">Job insecurity or academic struggles</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="factor-values" data-stress="10" onchange="updateStressCalculation()">
+                                <label for="factor-values">Forced to violate personal values at work/school</label>
+                            </div>
+                        </div>
+
+                        <div class="stress-score" id="calculatedStress">
+                            <p>Your Estimated Stress Level: <strong id="stressScoreValue">0</strong>%</p>
+                            <p style="font-size: 1rem; margin-top: 10px;" id="stressInterpretation"></p>
+                        </div>
+
+                        <div id="stressRecommendations" style="margin-top: 20px;"></div>
+                    </div>
+
+                    <p style="margin-top: 20px; color: #666;">This calculation helps you understand your current operating conditions. Click "Complete & Continue" when ready.</p>
+                `
+            },
+            {
+                id: 'quiz2',
+                type: 'quiz',
+                title: 'Concept Check 2: Implications for Ethics',
+                badge: 'Self-Graded',
+                badgeClass: 'badge-check',
+                time: '5 min',
+                questions: [
+                    {
+                        question: 'If someone is at 80% stress (low resolution), which is TRUE?',
+                        options: [
+                            'They\'re just not trying hard enough to be ethical',
+                            'They\'re a bad person with no moral character',
+                            'They physically cannot access complex moral reasoning—most capabilities are offline',
+                            'They can still make good decisions if they focus harder'
+                        ],
+                        correct: 2,
+                        explanation: 'At 80% stress, complex moral reasoning is literally offline. The brain cannot maintain that level of computational complexity at that "temperature." This is physics, not character.'
+                    },
+                    {
+                        question: 'Who is responsible when low-resolution agents cause harm?',
+                        options: [
+                            'Only the individual—they made the choice',
+                            'Only the institution—individuals have no responsibility',
+                            'Both—but institutions that FORCE low resolution share significant responsibility',
+                            'Nobody—it just happens'
+                        ],
+                        correct: 2,
+                        explanation: 'There\'s a spectrum of responsibility. If an institution systematically stresses people (high patient ratios, impossible demands), it shares responsibility for the resulting harm. You can\'t force people into survival mode and then blame them for not being ethical.'
+                    },
+                    {
+                        question: 'What does "BioBond" mean in this framework?',
+                        options: [
+                            'A financial bond to pay for therapy',
+                            'An intervention that reduces stress to restore resolution capacity',
+                            'A way to bond with your biology',
+                            'A type of insurance policy'
+                        ],
+                        correct: 1,
+                        explanation: 'BioBonds are interventions (like reducing nurse ratios from 1:12 to 1:4) that lower thermodynamic entropy (stress), allowing people to operate at higher resolution and maintain ethical behavior.'
+                    }
+                ]
+            },
+            {
+                id: 'journal',
+                type: 'journal',
+                title: 'Activity 3: Personal Reflection (GRADED)',
+                badge: 'Journal Response',
+                badgeClass: 'badge-journal',
+                time: '20 min',
+                prompt: `
+                    <div class="instructions">
+                        <strong>This response will be included in your export for grading.</strong>
+                    </div>
+
+                    <p style="margin: 20px 0; font-size: 1.05rem; line-height: 1.8;">
+                        Reflect on a time when you experienced significant stress and felt "not like yourself." 
+                        Analyze that experience using the resolution framework.
+                    </p>
+
+                    <p style="margin-bottom: 15px;"><strong>Address the following:</strong></p>
+
+                    <ol style="margin-left: 20px; line-height: 2;">
+                        <li><strong>Describe the situation:</strong> What was causing the stress? How long did it last?</li>
+                        
+                        <li><strong>Identify your stress level:</strong> Looking back, what % stress were you operating at? (Use your assessment from Activity 2 as reference)</li>
+                        
+                        <li><strong>Which capabilities went offline?</strong> Be specific:
+                            <ul style="margin-left: 20px; margin-top: 5px;">
+                                <li>Could you think long-term? See multiple perspectives?</li>
+                                <li>How was your emotional regulation?</li>
+                                <li>What happened to your empathy, patience, creativity?</li>
+                            </ul>
+                        </li>
+                        
+                        <li><strong>How did you behave differently?</strong>
+                            <ul style="margin-left: 20px; margin-top: 5px;">
+                                <li>Did you snap at people? Make errors?</li>
+                                <li>See things in black-and-white?</li>
+                                <li>Act in ways that weren't "like you"?</li>
+                            </ul>
+                        </li>
+
+                        <li><strong>Apply the framework:</strong> Using what you now know about resolution:
+                            <ul style="margin-left: 20px; margin-top: 5px;">
+                                <li>Was this "you being a bad person" or "you at low resolution"?</li>
+                                <li>What would have restored your resolution?</li>
+                                <li>If you were in a system (workplace, school, etc.), what could that system have done to reduce your stress?</li>
+                            </ul>
+                        </li>
+
+                        <li><strong>Ethical implications:</strong> What does this tell you about:
+                            <ul style="margin-left: 20px; margin-top: 5px;">
+                                <li>Personal responsibility vs. systemic responsibility?</li>
+                                <li>The conditions needed for ethical action?</li>
+                                <li>How we should judge people under stress?</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <p style="margin: 20px 0; color: #666;">
+                        <strong>Target:</strong> 400-600 words. Be honest and specific. Draw on your lived experience.
+                    </p>
+                `
+            }
+        ];
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        
+        function init() {
+            loadState();
+            
+            if (state.completedActivities.size > 0) {
+                document.getElementById('progressIndicator').textContent = 
+                    `${state.completedActivities.size} of ${activities.length} activities completed`;
+            } else {
+                document.getElementById('progressIndicator').textContent = 'Not started';
+            }
+        }
+
+        function updateProgressIndicator() {
+            const total = activities.length;
+            const completed = state.completedActivities.size;
+            const percent = Math.round((completed / total) * 100);
+            
+            const fill = document.getElementById('progressFill');
+            const text = document.getElementById('progressText');
+            
+            if (fill && text) {
+                fill.style.width = percent + '%';
+                fill.textContent = percent + '%';
+                fill.parentElement.setAttribute('aria-valuenow', percent);
+                text.textContent = `${completed} of ${total} activities completed`;
+            }
+        }
+
+        // ============================================
+        // MODE SELECTION
+        // ============================================
+        
+        function startMode(mode) {
+            if (mode === 'tutorial') {
+                startTutorial();
+            } else if (mode === 'workbook') {
+                document.getElementById('modeSelection').style.display = 'none';
+                document.getElementById('main-content').classList.add('active');
+                state.startTime = Date.now();
+                loadActivity(0);
+                saveState();
+            }
+        }
+
+        function continueProgress() {
+            document.getElementById('modeSelection').style.display = 'none';
+            document.getElementById('main-content').classList.add('active');
+            
+            let nextActivity = 0;
+            for (let i = 0; i < activities.length; i++) {
+                if (!state.completedActivities.has(i)) {
+                    nextActivity = i;
+                    break;
+                }
+            }
+            
+            state.currentActivity = nextActivity;
+            loadActivity(nextActivity);
+        }
+
+        // ============================================
+        // TUTORIAL SYSTEM
+        // ============================================
+        
+        const tutorialSteps = [
+            {
+                title: 'Welcome: The Resolution Metaphor',
+                content: `
+                    <p>Your identity is like a photograph or digital image.</p>
+                    <p style="margin: 15px 0;">When you're <strong>calm and safe</strong>: HIGH RESOLUTION</p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Detailed, nuanced, complex</li>
+                        <li>All the subtle colors and textures</li>
+                        <li>The "real you" in full detail</li>
+                    </ul>
+                    <p style="margin: 15px 0;">When you're <strong>stressed and overwhelmed</strong>: LOW RESOLUTION</p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Pixelated, simplified, generic</li>
+                        <li>Only basic shapes and colors</li>
+                        <li>A compressed version of you</li>
+                    </ul>
+                    <p style="margin-top: 15px;">This is NOT metaphor. It's actual physics.</p>
+                `
+            },
+            {
+                title: 'Why This Happens: Your Brain\'s Energy Budget',
+                content: `
+                    <p>Your brain is a computer that runs on energy (calories, oxygen, ATP).</p>
+                    <p style="margin: 15px 0;"><strong>Complex thinking is EXPENSIVE:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Seeing multiple perspectives</li>
+                        <li>Regulating emotions</li>
+                        <li>Planning long-term</li>
+                        <li>Being empathetic</li>
+                        <li>Making nuanced judgments</li>
+                    </ul>
+                    <p style="margin: 15px 0;"><strong>Simple thinking is CHEAP:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Us vs. them</li>
+                        <li>Black and white</li>
+                        <li>React now</li>
+                        <li>Survival mode</li>
+                    </ul>
+                    <p style="margin-top: 15px;">Under stress, your body chooses: SURVIVE (cheap) over THRIVE (expensive).</p>
+                `
+            },
+            {
+                title: 'The Resolution Collapse',
+                content: `
+                    <p style="margin-bottom: 15px;">As stress increases, capabilities go offline in a predictable order:</p>
+                    
+                    <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #4ade80;">
+                        <strong>0-30% Stress: HIGH RESOLUTION</strong><br>
+                        All capabilities online. You're your full self.
+                    </div>
+
+                    <div style="background: #fffbeb; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #fbbf24;">
+                        <strong>30-50% Stress: GOOD RESOLUTION</strong><br>
+                        Most capabilities still work but require more effort.
+                    </div>
+
+                    <div style="background: #fed7aa; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #f97316;">
+                        <strong>50-70% Stress: REDUCED RESOLUTION</strong><br>
+                        Complex thinking difficult. Emotional regulation shaky.
+                    </div>
+
+                    <div style="background: #fecaca; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #ef4444;">
+                        <strong>70%+ Stress: SURVIVAL MODE</strong><br>
+                        Most capabilities offline. Only basic responses available.
+                    </div>
+                `
+            },
+            {
+                title: 'Why This Matters for Ethics',
+                content: `
+                    <p style="margin-bottom: 15px;"><strong>Traditional ethics says:</strong> "Be virtuous. Do the right thing."</p>
+                    
+                    <p style="margin-bottom: 15px;"><strong>Problem:</strong> This assumes you HAVE the resolution to do complex moral reasoning.</p>
+                    
+                    <p style="margin-bottom: 15px;">At 80% stress:</p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>You CAN'T see multiple perspectives (offline)</li>
+                        <li>You CAN'T regulate emotions (offline)</li>
+                        <li>You CAN'T plan long-term (offline)</li>
+                        <li>You CAN'T be empathetic (offline)</li>
+                    </ul>
+
+                    <p style="margin: 20px 0;"><strong>Question:</strong> Are you "bad" or are you operating at 20% capacity?</p>
+
+                    <p style="margin-top: 15px;"><strong>If institutions force you into survival mode, who's responsible for the resulting harm?</strong></p>
+                `
+            },
+            {
+                title: 'Resolution is Recoverable',
+                content: `
+                    <p style="margin-bottom: 15px;"><strong>Good news:</strong> Unlike physical damage, resolution loss is usually temporary.</p>
+                    
+                    <p style="margin-bottom: 15px;"><strong>What restores resolution:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Sleep:</strong> Recharges your energy budget</li>
+                        <li><strong>Safety:</strong> Turns off threat response</li>
+                        <li><strong>Support:</strong> Reduces cognitive load</li>
+                        <li><strong>Time:</strong> Allows metabolic recovery</li>
+                    </ul>
+
+                    <p style="margin: 20px 0;"><strong>But:</strong> If the environment KEEPS you stressed, you can't recover.</p>
+
+                    <p style="margin-top: 15px;">This is why institutional design matters. A just institution maintains conditions where people can operate at high resolution.</p>
+                `
+            },
+            {
+                title: 'Ready to Explore!',
+                content: `
+                    <p style="margin-bottom: 15px;">Now you'll:</p>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>✅ See how resolution works interactively</li>
+                        <li>✅ Calculate your own stress level</li>
+                        <li>✅ Learn the implications for ethics</li>
+                        <li>✅ Reflect on your own experience</li>
+                    </ul>
+                    <p style="margin-top: 20px; font-size: 1.1rem;"><strong>Let's begin!</strong></p>
+                `
+            }
+        ];
+
+        function startTutorial() {
+            state.tutorialStep = 0;
+            document.getElementById('tutorialOverlay').classList.add('active');
+            showTutorialStep();
+        }
+
+        function showTutorialStep() {
+            const step = tutorialSteps[state.tutorialStep];
+            document.getElementById('tutorialStep').textContent = 
+                `Step ${state.tutorialStep + 1} of ${tutorialSteps.length}`;
+            document.getElementById('tutorialTitle').textContent = step.title;
+            document.getElementById('tutorialContent').innerHTML = step.content;
+            
+            document.getElementById('tutorialPrev').disabled = state.tutorialStep === 0;
+            document.getElementById('tutorialNext').textContent = 
+                state.tutorialStep === tutorialSteps.length - 1 ? 'Start Activities ➡️' : 'Next ➡️';
+        }
+
+        function tutorialNext() {
+            if (state.tutorialStep < tutorialSteps.length - 1) {
+                state.tutorialStep++;
+                showTutorialStep();
+            } else {
+                completeTutorial();
+            }
+        }
+
+        function tutorialPrevious() {
+            if (state.tutorialStep > 0) {
+                state.tutorialStep--;
+                showTutorialStep();
+            }
+        }
+
+        function skipTutorial() {
+            if (confirm('Skip the tutorial? You can always review concepts in the workbook.')) {
+                completeTutorial();
+            }
+        }
+
+        function completeTutorial() {
+            document.getElementById('tutorialOverlay').classList.remove('active');
+            state.tutorialCompleted = true;
+            saveState();
+            startMode('workbook');
+        }
+
+        // ============================================
+        // ACTIVITY LOADING
+        // ============================================
+        
+        function loadActivity(index) {
+            const activity = activities[index];
+            state.currentActivity = index;
+            
+            const container = document.getElementById('activitiesContainer');
+            container.innerHTML = '';
+            
+            const activityEl = document.createElement('div');
+            activityEl.className = 'activity active';
+            activityEl.id = `activity-${activity.id}`;
+            
+            let content = `
+                <div class="activity-header">
+                    <h2 class="activity-title">${activity.title}</h2>
+                    <div>
+                        <span class="activity-badge ${activity.badgeClass}">${activity.badge}</span>
+                        <span style="margin-left: 10px; color: #666; font-size: 0.9rem;">⏱️ ${activity.time}</span>
+                    </div>
+                </div>
+            `;
+            
+            if (activity.type === 'intro') {
+                content += activity.content;
+                content += `
+                    <div class="button-group">
+                        <button onclick="completeActivity(${index})">Start Activities ➡️</button>
+                    </div>
+                `;
+            } else if (activity.type === 'completion') {
+                content += activity.content;
+                content += `
+                    <div class="button-group">
+                        <button onclick="completeActivity(${index})">Complete & Continue ➡️</button>
+                        ${index > 0 ? `<button onclick="loadActivity(${index - 1})" class="secondary">⬅️ Previous</button>` : ''}
+                    </div>
+                `;
+            } else if (activity.type === 'quiz') {
+                content += `<div id="quiz-${activity.id}">`;
+                activity.questions.forEach((q, i) => {
+                    content += `
+                        <div class="quiz-question">
+                            <h4>Question ${i + 1}: ${q.question}</h4>
+                            <div class="quiz-options">
+                                ${q.options.map((opt, j) => `
+                                    <label class="quiz-option">
+                                        <input type="radio" 
+                                               name="q${i}" 
+                                               value="${j}"
+                                               onchange="checkQuizAnswer(${index}, ${i}, ${j}, ${q.correct})">
+                                        ${opt}
+                                    </label>
+                                `).join('')}
+                            </div>
+                            <div class="quiz-feedback" id="feedback-${activity.id}-${i}"></div>
+                        </div>
+                    `;
+                });
+                content += `</div>`;
+                content += `
+                    <div class="button-group">
+                        <button id="quizContinue-${activity.id}" onclick="completeActivity(${index})" disabled>
+                            Continue ➡️
+                        </button>
+                        ${index > 0 ? `<button onclick="loadActivity(${index - 1})" class="secondary">⬅️ Previous</button>` : ''}
+                    </div>
+                `;
+            } else if (activity.type === 'journal') {
+                content += activity.prompt;
+                const savedResponse = state.responses[activity.id] || '';
+                content += `
+                    <textarea id="journal-${activity.id}" 
+                              class="journal-area" 
+                              placeholder="Write your response here..."
+                              oninput="updateWordCount('${activity.id}')"
+                              aria-label="Journal response text area">${savedResponse}</textarea>
+                    <div class="word-count" id="wordcount-${activity.id}">0 words</div>
+                `;
+                content += `
+                    <div class="button-group">
+                        <button onclick="completeActivity(${index})">Save & Continue ➡️</button>
+                        ${index > 0 ? `<button onclick="loadActivity(${index - 1})" class="secondary">⬅️ Previous</button>` : ''}
+                        <button onclick="autoSaveJournal('${activity.id}')" class="secondary">💾 Save Draft</button>
+                    </div>
+                `;
+            }
+            
+            activityEl.innerHTML = content;
+            container.appendChild(activityEl);
+            
+            // Initialize activity-specific functionality
+            if (activity.id === 'baseline') {
+                updateBaselineDisplay();
+            } else if (activity.id === 'assessment') {
+                updateStressCalculation();
+            } else if (activity.type === 'journal') {
+                updateWordCount(activity.id);
+            }
+            
+            updateProgressIndicator();
+            window.scrollTo(0, 0);
+            saveState();
+        }
+
+        function completeActivity(index) {
+            const activity = activities[index];
+            
+            if (activity.type === 'journal') {
+                const textarea = document.getElementById(`journal-${activity.id}`);
+                if (textarea) {
+                    state.responses[activity.id] = textarea.value;
+                }
+            }
+            
+            state.completedActivities.add(index);
+            saveState();
+            
+            if (index < activities.length - 1) {
+                loadActivity(index + 1);
+            } else {
+                showCompletion();
+            }
+        }
+
+        function showCompletion() {
+            const container = document.getElementById('activitiesContainer');
+            container.innerHTML = `
+                <div class="completion-badge">
+                    <div class="completion-icon">🎉</div>
+                    <h3>Workbook Complete!</h3>
+                    <p>You've finished all activities. Your work is ready to export.</p>
+                    <p style="margin-top: 15px; color: #666;">
+                        Time spent: ${getTimeSpent()}
+                    </p>
+                </div>
+            `;
+            
+            document.getElementById('exportSection').style.display = 'block';
+        }
+
+        function getTimeSpent() {
+            if (!state.startTime) return 'Unknown';
+            const minutes = Math.round((Date.now() - state.startTime) / 60000);
+            return `${minutes} minutes`;
+        }
+
+        // ============================================
+        // SIMULATOR FUNCTIONS
+        // ============================================
+        
+        function initializePixelGrid(gridSize, containerId) {
+            const grid = document.getElementById(containerId);
+            if (!grid) return;
+            
             grid.innerHTML = '';
             grid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
             
@@ -607,93 +1595,45 @@
             }
         }
 
-        function updateVisualization(stress) {
-            currentStress = stress;
+        function updateBaselineDisplay() {
+            const stress = parseInt(document.getElementById('baselineStress').value);
+            state.stressLevel = stress;
             
-            // Update display
-            document.getElementById('stressValue').textContent = stress;
+            document.getElementById('baselineStressValue').textContent = stress;
+            document.getElementById('baselineStress').setAttribute('aria-valuenow', stress);
             
-            // Update emoji
-            const emojiSpan = document.getElementById('stressEmoji');
+            // Update display color
+            const display = document.getElementById('baselineStressDisplay');
             if (stress < 30) {
-                emojiSpan.textContent = '😌';
+                display.style.background = '#d1fae5';
+                display.style.color = '#065f46';
             } else if (stress < 50) {
-                emojiSpan.textContent = '😐';
+                display.style.background = '#fef3c7';
+                display.style.color = '#78350f';
             } else if (stress < 70) {
-                emojiSpan.textContent = '😰';
-            } else if (stress < 85) {
-                emojiSpan.textContent = '😱';
+                display.style.background = '#fed7aa';
+                display.style.color = '#7c2d12';
             } else {
-                emojiSpan.textContent = '🔥';
+                display.style.background = '#fecaca';
+                display.style.color = '#991b1b';
             }
             
-            // Update stress display color
-            const stressDisplay = document.getElementById('stressDisplay');
-            if (stress < 30) {
-                stressDisplay.style.background = '#d1fae5';
-                stressDisplay.style.color = '#065f46';
-            } else if (stress < 50) {
-                stressDisplay.style.background = '#fef3c7';
-                stressDisplay.style.color = '#78350f';
-            } else if (stress < 70) {
-                stressDisplay.style.background = '#fed7aa';
-                stressDisplay.style.color = '#7c2d12';
-            } else if (stress < 85) {
-                stressDisplay.style.background = '#fecaca';
-                stressDisplay.style.color = '#991b1b';
-            } else {
-                stressDisplay.style.background = '#991b1b';
-                stressDisplay.style.color = 'white';
-            }
-            
-            // Update pixel grid resolution
+            // Update pixel grid
             let gridSize;
-            if (stress < 30) {
-                gridSize = 20; // 400 pixels
-            } else if (stress < 50) {
-                gridSize = 15; // 225 pixels
-            } else if (stress < 70) {
-                gridSize = 10; // 100 pixels
-            } else if (stress < 85) {
-                gridSize = 6; // 36 pixels
-            } else {
-                gridSize = 4; // 16 pixels
-            }
+            if (stress < 30) gridSize = 20; // 400 pixels
+            else if (stress < 50) gridSize = 15; // 225 pixels
+            else if (stress < 70) gridSize = 10; // 100 pixels
+            else if (stress < 85) gridSize = 6; // 36 pixels
+            else gridSize = 4; // 16 pixels
             
-            initializePixelGrid(gridSize);
-            document.getElementById('pixelCount').textContent = gridSize * gridSize;
-            
-            // Update resolution label
-            const resLabel = document.getElementById('resolutionLabel');
-            if (stress < 30) {
-                resLabel.textContent = 'HIGH RESOLUTION';
-                resLabel.style.color = '#065f46';
-            } else if (stress < 50) {
-                resLabel.textContent = 'GOOD RESOLUTION';
-                resLabel.style.color = '#78350f';
-            } else if (stress < 70) {
-                resLabel.textContent = 'REDUCED RESOLUTION';
-                resLabel.style.color = '#c2410c';
-            } else if (stress < 85) {
-                resLabel.textContent = 'LOW RESOLUTION';
-                resLabel.style.color = '#991b1b';
-            } else {
-                resLabel.textContent = 'SURVIVAL MODE ONLY';
-                resLabel.style.color = '#7f1d1d';
-            }
+            initializePixelGrid(gridSize, 'baselinePixelGrid');
+            document.getElementById('baselinePixelCount').textContent = gridSize * gridSize;
             
             // Update capabilities
-            updateCapabilities(stress);
+            const capabilitiesDiv = document.getElementById('baselineCapabilities');
+            capabilitiesDiv.innerHTML = '';
             
-            // Update explanation
-            updateExplanation(stress);
-        }
-
-        function updateCapabilities(stress) {
-            const list = document.getElementById('capabilitiesList');
-            list.innerHTML = '';
-            
-            capabilities.forEach(cap => {
+            capabilities.slice(0, 5).forEach(cap => {
                 const item = document.createElement('div');
                 item.className = 'capability-item';
                 
@@ -714,162 +1654,290 @@
                 
                 item.classList.add(status);
                 item.innerHTML = `
-                    <span class="capability-icon">${cap.icon}</span>
+                    <span class="capability-icon" aria-hidden="true">${cap.icon}</span>
                     <span class="capability-text">${cap.text}</span>
                     <span class="capability-status ${statusClass}">${statusText}</span>
                 `;
                 
-                list.appendChild(item);
+                capabilitiesDiv.appendChild(item);
             });
-        }
-
-        function updateExplanation(stress) {
-            const explanations = [
-                {
-                    range: [0, 30],
-                    text: `<strong>You're operating at high resolution.</strong> Your full identity is available. You can handle complex moral dilemmas, see situations from multiple perspectives, and regulate your emotions effectively. This is "Manual Mode" - the sophisticated, nuanced version of you. Your brain has the energy budget to maintain all the details that make you <em>you</em>.`
-                },
-                {
-                    range: [30, 50],
-                    text: `<strong>You're starting to lose some resolution.</strong> Most capabilities are still online, but they require more conscious effort. Complex thinking is harder. Emotional regulation takes more energy. You can still be your full self, but it's getting more expensive. Think of this as your phone at 50% battery - everything works, but you're watching the power drain.`
-                },
-                {
-                    range: [50, 70],
-                    text: `<strong>Your identity is simplifying.</strong> You're losing access to nuanced judgment and long-term planning. Empathy becomes difficult. You start seeing things in black-and-white rather than shades of gray. This is the transition from "Manual Mode" to "Automatic Mode" - your brain is shedding complexity to conserve energy. You're still you, but a compressed version.`
-                },
-                {
-                    range: [70, 85],
-                    text: `<strong>You're in survival mode.</strong> Most sophisticated capabilities are offline. Complex moral reasoning is impossible - you can only handle simple, binary choices. Emotional regulation has failed. Future planning has collapsed to "get through today." Your identity has truncated to basic survival patterns. This isn't weakness - your brain literally cannot maintain complexity at this temperature.`
-                },
-                {
-                    range: [85, 100],
-                    text: `<strong>Complete truncation - crisis mode.</strong> Only the most primitive responses remain. Fight, flight, freeze. No empathy, no planning, no self-control, no nuance. You've been reduced to pure reflex. The complex, nuanced person you are has been temporarily compressed to save power. This is what burnout, severe PTSD, or extreme crisis looks like. You haven't lost yourself forever - but you've lost access to almost all of yourself right now.`
-                }
-            ];
             
-            const explanation = explanations.find(e => stress >= e.range[0] && stress < e.range[1]);
-            document.getElementById('explanationText').innerHTML = explanation.text;
+            // Update explanation
+            let explanation = '';
+            if (stress < 30) {
+                explanation = '<strong style="color: #059669;">✅ HIGH RESOLUTION:</strong> All capabilities online. You can handle complex moral reasoning, see multiple perspectives, and regulate emotions effectively. This is sustainable.';
+            } else if (stress < 50) {
+                explanation = '<strong style="color: #f59e0b;">⚠️ GOOD RESOLUTION:</strong> Most capabilities still work, but they take more effort. You can still be your full self, but it\'s getting harder.';
+            } else if (stress < 70) {
+                explanation = '<strong style="color: #f97316;">🚨 REDUCED RESOLUTION:</strong> You\'re losing access to nuanced judgment and complex thinking. Emotional regulation is difficult. Ethical behavior is much harder.';
+            } else {
+                explanation = '<strong style="color: #ef4444;">☠️ SURVIVAL MODE:</strong> Most sophisticated capabilities are offline. You can only handle simple, binary decisions. Complex ethics is impossible at this temperature.';
+            }
+            
+            document.getElementById('baselineExplanation').innerHTML = explanation;
         }
 
-        function calculatePersonalStress() {
-            const checkboxes = document.querySelectorAll('.stress-factor:checked');
+        function updateStressCalculation() {
+            const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked');
             let totalStress = 0;
             
             checkboxes.forEach(checkbox => {
                 totalStress += parseInt(checkbox.dataset.stress);
             });
             
-            // Cap at 100
             totalStress = Math.min(totalStress, 100);
             
-            // Update the slider
-            document.getElementById('stressSlider').value = totalStress;
-            updateVisualization(totalStress);
+            document.getElementById('stressScoreValue').textContent = totalStress;
             
-            // Show result
-            const resultDiv = document.getElementById('yourResult');
-            let resultText = '';
-            let resolutionPercent = Math.max(0, 100 - totalStress);
+            const scoreDiv = document.getElementById('calculatedStress');
+            const interpretation = document.getElementById('stressInterpretation');
+            const recommendations = document.getElementById('stressRecommendations');
             
             if (totalStress < 30) {
-                resultText = `
-                    <h4>Your Estimated Current State:</h4>
-                    <div class="result-score" style="color: #065f46;">
-                        ${resolutionPercent}% Resolution Available
-                    </div>
-                    <div class="result-explanation">
-                        <p><strong>Status: High Resolution - Functioning Well</strong></p>
-                        <p>You're operating with most of your cognitive and emotional capabilities intact. While you have some stress factors, they're manageable and not significantly compromising your ability to be your full self.</p>
-                    </div>
-                    <div class="recommendations">
-                        <h5>To Maintain High Resolution:</h5>
-                        <ul>
-                            <li>Protect your sleep schedule</li>
-                            <li>Maintain social connections</li>
-                            <li>Keep up with self-care practices</li>
-                            <li>Watch for early signs of stress accumulation</li>
-                        </ul>
+                scoreDiv.style.background = '#d1fae5';
+                scoreDiv.style.color = '#065f46';
+                interpretation.textContent = '✅ Low stress - You\'re operating at high resolution';
+                recommendations.innerHTML = `
+                    <div style="background: #f0fdf4; padding: 15px; border-radius: 10px; border-left: 4px solid #059669;">
+                        <strong>Status: Healthy functioning</strong><br>
+                        Maintain your current practices. Protect your sleep, relationships, and work-life balance.
                     </div>
                 `;
             } else if (totalStress < 50) {
-                resultText = `
-                    <h4>Your Estimated Current State:</h4>
-                    <div class="result-score" style="color: #78350f;">
-                        ${resolutionPercent}% Resolution Available
-                    </div>
-                    <div class="result-explanation">
-                        <p><strong>Status: Good Resolution - Some Compression</strong></p>
-                        <p>You're experiencing moderate stress that's starting to affect your capacity. You can still function well, but it takes more effort. Some capabilities are beginning to degrade.</p>
-                    </div>
-                    <div class="recommendations">
-                        <h5>To Prevent Further Degradation:</h5>
-                        <ul>
-                            <li>Prioritize addressing 1-2 major stressors</li>
-                            <li>Build in recovery time between demands</li>
-                            <li>Seek support for areas where you're struggling</li>
-                            <li>Practice stress management techniques</li>
-                        </ul>
+                scoreDiv.style.background = '#fef3c7';
+                scoreDiv.style.color = '#78350f';
+                interpretation.textContent = '⚠️ Moderate stress - Some resolution loss';
+                recommendations.innerHTML = `
+                    <div style="background: #fffbeb; padding: 15px; border-radius: 10px; border-left: 4px solid #fbbf24;">
+                        <strong>Status: Manageable but watch for escalation</strong><br>
+                        Prioritize addressing 1-2 major stressors. Build in recovery time. Seek support where possible.
                     </div>
                 `;
             } else if (totalStress < 70) {
-                resultText = `
-                    <h4>Your Estimated Current State:</h4>
-                    <div class="result-score" style="color: #c2410c;">
-                        ${resolutionPercent}% Resolution Available
-                    </div>
-                    <div class="result-explanation">
-                        <p><strong>Status: Reduced Resolution - Significant Impact</strong></p>
-                        <p>You're under substantial stress that's meaningfully compromising your capabilities. Complex thinking, emotional regulation, and long-term planning are all degraded. This is the range where burnout begins.</p>
-                    </div>
-                    <div class="recommendations">
-                        <h5>⚠️ Restoration Needed:</h5>
-                        <ul>
-                            <li><strong>Priority: Reduce major stressors ASAP</strong></li>
-                            <li>Consider professional support (therapy, counseling)</li>
-                            <li>Communicate your limits to others</li>
-                            <li>Focus on basic self-care (sleep, food, safety)</li>
-                            <li>This is not sustainable - changes needed</li>
-                        </ul>
+                scoreDiv.style.background = '#fed7aa';
+                scoreDiv.style.color = '#7c2d12';
+                interpretation.textContent = '🚨 High stress - Significant resolution loss';
+                recommendations.innerHTML = `
+                    <div style="background: #fff7ed; padding: 15px; border-radius: 10px; border-left: 4px solid #f97316;">
+                        <strong>Status: Concerning - intervention needed</strong><br>
+                        This level of stress is unsustainable. Consider professional support (counseling, therapy). Communicate your limits to others. This is not sustainable.
                     </div>
                 `;
             } else {
-                resultText = `
-                    <h4>Your Estimated Current State:</h4>
-                    <div class="result-score" style="color: #991b1b;">
-                        ${resolutionPercent}% Resolution Available
-                    </div>
-                    <div class="result-explanation">
-                        <p><strong>Status: Low Resolution - Crisis Level</strong></p>
-                        <p>You're in a severe stress state that has substantially truncated your identity and capabilities. Most sophisticated functions are offline. This is survival mode - and it's not sustainable.</p>
-                    </div>
-                    <div class="recommendations">
-                        <h5>🚨 Immediate Intervention Needed:</h5>
-                        <ul>
-                            <li><strong>Seek professional help immediately</strong></li>
-                            <li>Crisis hotline if in acute distress: 988</li>
-                            <li>Reduce obligations wherever possible</li>
-                            <li>Ask for help from support system</li>
-                            <li>Focus only on basic survival needs</li>
-                            <li>This level of stress causes physical harm over time</li>
-                        </ul>
+                scoreDiv.style.background = '#fecaca';
+                scoreDiv.style.color = #991b1b';
+                interpretation.textContent = '☠️ Critical stress - Operating in survival mode';
+                recommendations.innerHTML = `
+                    <div style="background: #fef2f2; padding: 15px; border-radius: 10px; border-left: 4px solid #dc2626;">
+                        <strong>Status: CRISIS - immediate help needed</strong><br>
+                        Seek professional help immediately. Crisis hotline if in acute distress: 988. 
+                        Reduce obligations wherever possible. This level causes physical harm over time.
                     </div>
                 `;
             }
-            
-            resultDiv.innerHTML = resultText;
-            resultDiv.classList.add('show');
-            
-            // Scroll to result
-            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        // Event listeners
-        document.getElementById('stressSlider').addEventListener('input', (e) => {
-            updateVisualization(parseInt(e.target.value));
-        });
+        // ============================================
+        // QUIZ FUNCTIONS
+        // ============================================
+        
+        function checkQuizAnswer(activityIndex, questionIndex, selected, correct) {
+            const activity = activities[activityIndex];
+            const feedback = document.getElementById(`feedback-${activity.id}-${questionIndex}`);
+            const question = activity.questions[questionIndex];
+            
+            if (selected === correct) {
+                feedback.className = 'quiz-feedback correct';
+                feedback.innerHTML = `<strong>✓ Correct!</strong> ${question.explanation}`;
+            } else {
+                feedback.className = 'quiz-feedback incorrect';
+                feedback.innerHTML = `<strong>✗ Not quite.</strong> ${question.explanation}`;
+            }
+            
+            const allAnswered = activity.questions.every((q, i) => {
+                return document.querySelector(`input[name="q${i}"]:checked`);
+            });
+            
+            if (allAnswered) {
+                document.getElementById(`quizContinue-${activity.id}`).disabled = false;
+            }
+        }
 
-        // Initialize on load
-        updateVisualization(25);
+        // ============================================
+        // JOURNAL FUNCTIONS
+        // ============================================
+        
+        function updateWordCount(activityId) {
+            const textarea = document.getElementById(`journal-${activityId}`);
+            const countDiv = document.getElementById(`wordcount-${activityId}`);
+            
+            if (textarea && countDiv) {
+                const text = textarea.value.trim();
+                const words = text ? text.split(/\s+/).length : 0;
+                countDiv.textContent = `${words} words`;
+                
+                if (words < 400) {
+                    countDiv.className = 'word-count';
+                } else if (words <= 600) {
+                    countDiv.className = 'word-count status-complete';
+                } else {
+                    countDiv.className = 'word-count char-limit-warning';
+                    countDiv.textContent = `${words} words (recommended: 400-600)`;
+                }
+            }
+        }
+
+        function autoSaveJournal(activityId) {
+            const textarea = document.getElementById(`journal-${activityId}`);
+            if (textarea) {
+                state.responses[activityId] = textarea.value;
+                saveState();
+                
+                const status = document.getElementById('srAnnouncements');
+                status.textContent = 'Draft saved';
+                setTimeout(() => status.textContent = '', 2000);
+                
+                alert('Draft saved! Your response is stored locally.');
+            }
+        }
+
+        // ============================================
+        // EXPORT FUNCTIONS
+        // ============================================
+        
+        function generateExportText() {
+            const name = state.studentName || 'Student';
+            const date = new Date().toLocaleDateString();
+            const time = getTimeSpent();
+            
+            let text = `=============================================
+IDENTITY RESOLUTION LEARNING SYSTEM
+Workbook Responses
+=============================================
+
+Student Name: ${name}
+Date Completed: ${date}
+Time Spent: ${time}
+
+=============================================
+
+`;
+
+            // Add journal response
+            const journalActivity = activities.find(a => a.id === 'journal');
+            if (journalActivity && state.responses.journal) {
+                text += `GRADED RESPONSE: ${journalActivity.title}
+---------------------------------------------
+
+${state.responses.journal}
+
+---------------------------------------------
+Word Count: ${state.responses.journal.trim().split(/\s+/).length}
+
+=============================================
+
+`;
+            }
+
+            // Add stress assessment
+            text += `STRESS ASSESSMENT RESULTS
+---------------------------------------------
+
+Self-calculated stress level: ${state.stressLevel}%
+
+Factors identified:
+`;
+
+            const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked');
+            if (checkboxes.length > 0) {
+                checkboxes.forEach(cb => {
+                    const label = cb.parentElement.querySelector('label');
+                    if (label) {
+                        text += `- ${label.textContent}\n`;
+                    }
+                });
+            } else {
+                text += `(No stress factors recorded)\n`;
+            }
+
+            text += `
+This data was captured during Activity 2.
+
+=============================================
+
+COMPLETION STATUS
+---------------------------------------------
+
+Activities Completed: ${state.completedActivities.size} of ${activities.length}
+
+`;
+
+            activities.forEach((activity, index) => {
+                const completed = state.completedActivities.has(index);
+                text += `${completed ? '✓' : '○'} ${activity.title}\n`;
+            });
+
+            text += `
+=============================================
+
+This export was generated by the Identity Resolution Learning System.
+Ethics Beyond Boundaries | Saint Petersburg College
+
+For questions about this assignment, contact your instructor.
+
+=============================================
+`;
+
+            return text;
+        }
+
+        function exportToFile() {
+            const text = generateExportText();
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Identity_Resolution_Workbook_${state.studentName || 'Student'}_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            document.getElementById('exportStatus').innerHTML = 
+                '<span class="status-complete">✓ File downloaded! Submit this file to your instructor.</span>';
+        }
+
+        function copyToClipboard() {
+            const text = generateExportText();
+            
+            navigator.clipboard.writeText(text).then(() => {
+                document.getElementById('exportStatus').innerHTML = 
+                    '<span class="status-complete">✓ Copied to clipboard! Paste into your journal or assignment submission.</span>';
+            }).catch(err => {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                document.getElementById('exportStatus').innerHTML = 
+                    '<span class="status-complete">✓ Copied to clipboard!</span>';
+            });
+        }
+
+        function previewExport() {
+            const preview = document.getElementById('exportPreview');
+            preview.textContent = generateExportText();
+            preview.style.display = 'block';
+        }
+
+        // ============================================
+        // INITIALIZATION ON LOAD
+        // ============================================
+        
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
